@@ -171,7 +171,7 @@ var duvalzones = {
     {
       "methane":0.98,
       "ethylene":0,
-      "acetylene":0.0
-    },
+      "acetylene":0.02
+    }
   ]
 }

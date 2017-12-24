@@ -1,6 +1,6 @@
-Plotly.d3.json(duvalzones, function(err, rawData) {
-    //if (err) throw err;
-    console.log(duvalzones)
+Plotly.d3.json('./duvalzones.json', function(err, rawData) {
+    if (err) throw err;
+    //console.log(duvalzones)
     plot(duvalzones);
 });
 
@@ -13,9 +13,9 @@ function plot(rawData) {
             mode: 'lines',
             name: k,
             a: pts.map(function(d) { return d.methane }),
-            b: pts.map(function(d) { return d.ethylene }),
-            c: pts.map(function(d) { return d.acetylene }),
-            line: { color: '#c00' }
+            b: pts.map(function(d) { return d.acetylene }),
+            c: pts.map(function(d) { return d.ethylene }),
+            line: { color: '#00a' }
         };
     });
 
@@ -23,8 +23,8 @@ function plot(rawData) {
         ternary: {
             sum: 100,
             aaxis: makeAxis('methane'),
-            baxis: makeAxis('ethylene'),
-            caxis: makeAxis('acetylene')
+            baxis: makeAxis('acetylene'),
+            caxis: makeAxis('ethylene')
         },
         showlegend: false,
         width: 700,
@@ -33,7 +33,14 @@ function plot(rawData) {
             text: 'Duval Triangle',
             x: 0.15,
             y: 1.1
-        }]
+        },
+        {
+          showarrow:true,
+          text: 'hello world',
+          x: 0.80,
+          y: 0.48
+        }
+      ]
     };
 
     Plotly.plot('graph', data, layout);
