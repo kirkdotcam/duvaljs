@@ -159,6 +159,11 @@
   "pd":[
     {
       "methane":0.98,
+      "ethylene":0,
+      "acetylene":0.02
+    },
+    {
+      "methane":0.98,
       "ethylene":0.02,
       "acetylene":0
     },
@@ -166,11 +171,6 @@
       "methane":1,
       "ethylene":0,
       "acetylene":0
-    },
-    {
-      "methane":0.98,
-      "ethylene":0,
-      "acetylene":0.02
-    },
+    }
   ]
 }
