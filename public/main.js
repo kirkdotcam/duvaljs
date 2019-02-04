@@ -1,4 +1,4 @@
-Plotly.d3.json('./duvalzones.json', function(err, rawData) {
+Plotly.d3.json('https://gist.githubusercontent.com/CamKirk/4f79620669c377e0962a12fdc6812f83/raw/duvaltriangle.json', function(err, rawData) {
     if (err) throw err;
     plot(rawData);
 });
