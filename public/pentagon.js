@@ -10,35 +10,39 @@ let centerY = height / 2;
 let numSides = 5;
 let radius = height / 3;
 
+drawFrame();
 
+function drawFrame(){
 
-drawSegments();
-
-
-function drawSegments() {
   let segments = d3.range(numSides)
-    .map(i => {
-      let angle = i / numSides * (Math.PI * 2) + Math.PI;
-      return {
-        x: Math.sin(angle) * radius + centerX,
-        y: Math.cos(angle) * radius + centerY
-      };
-    })
-    .map((value, index, points) => ({
-      x1: points[index].x,
-      y1: points[index].y,
-      x2: points[(index + 1) % numSides].x,
-      y2: points[(index + 1) % numSides].y
-    }));
-  svg.selectAll('line').data(segments)
-    .enter().append('line')
-    .attr('x1', d => d.x1)
-    .attr('y1', d => d.y1)
-    .attr('x2', d => d.x2)
-    .attr('y2', d => d.y2)
-    .attr('stroke', 'black')
-    .attr('stroke-width', 1);
+  .map(i => {
+    let angle = i / numSides * (Math.PI * 2) + Math.PI;
+    return [
+      Math.sin(angle) * radius + centerX,
+      Math.cos(angle) * radius + centerY
+    ]
+    ;
+  });
+
+  segments.push(segments[0]);
+  
+  let lineFunction = d3.line()
+    .x(d=>d[0])
+    .y(d=>d[1]);
+
+  svg.append("path")
+    .attr("d", lineFunction(segments))
+    .attr("stroke","blue")
+    .attr("stroke-width", 3)
+    .attr("fill", "none");
 }
+
+function drawZones(){
+  
+}
+
+function drawPoint(){}
+
 
 svg.append('line')
   .attr('x1', _ => 20)
