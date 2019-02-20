@@ -10,6 +10,10 @@ let centerY = height / 2;
 let numSides = 5;
 let radius = height / 3;
 
+let zonepoints = d3.json('./pentagonbasic.json')
+  .then((res)=>drawZones(res));
+
+
 drawFrame();
 
 function drawFrame(){
@@ -37,11 +41,25 @@ function drawFrame(){
     .attr("fill", "none");
 }
 
-function drawZones(){
-  
+function drawZones(zones){
+  console.log(zones["d2"]);
+
+  let lineFunction = d3.line()
+    .x(d=>d.x+centerX)
+    .y(d=>d.y+centerY);
+
+  // for (const key in zones) {
+    svg.append("path")
+    .attr("d", lineFunction(zones["d2"]))
+    .attr("stroke","black")
+    .attr("stroke-width", 3)
+    .attr("fill", "none");
+  // }
 }
 
-function drawPoint(){}
+function drawPoint(){
+
+}
 
 
 svg.append('line')
