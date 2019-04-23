@@ -41,24 +41,28 @@ function drawFrame(){
     .attr("fill", "none");
 }
 
-function drawZones(zones){
-  console.log(zones["d2"]);
-
+function drawZones(zone){
+  console.log(zone);
+  console.log(radius)
   let lineFunction = d3.line()
-    .x(d=>d.x+centerX)
-    .y(d=>d.y+centerY);
+    .x(d=> d.x* 2.5 +centerX) // need to scale the x and y values up to the radius of the frame
+    .y(d=>-2.5*d.y+centerY);
 
-  // for (const key in zones) {
+  for (const key in zone) {
     svg.append("path")
-    .attr("d", lineFunction(zones["d2"]))
+    .attr("d", lineFunction(zone[key]))
     .attr("stroke","black")
     .attr("stroke-width", 3)
     .attr("fill", "none");
-  // }
+  }
 }
 
-function drawPoint(){
+// zones.foreach((zone)=>{
+//   drawZones(zone)
+// })
 
+function drawPoint(){
+  
 }
 
 
