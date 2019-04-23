@@ -9,9 +9,13 @@ let centerX = width / 2;
 let centerY = height / 2;
 let numSides = 5;
 let radius = height / 3;
+let globalPoints = {};
 
 let zonepoints = d3.json('./pentagonbasic.json')
-  .then((res)=>drawZones(res));
+  .then((res)=>{
+    globalPoints = res
+    drawZones(res)
+  });
 
 
 drawFrame();
@@ -57,14 +61,32 @@ function drawZones(zone){
   }
 }
 
-// zones.foreach((zone)=>{
-//   drawZones(zone)
-// })
-
 function drawPoint(){
-  
-}
 
+}
+let newpoints = []
+//transform zonepoints
+zonepoints.then(()=>{
+  newpoints = Object.values(globalPoints).map((shape)=>{
+    return Object.values(shape).map((point)=>{
+      return Object.values(point)
+    })
+  })
+
+  newpoints.forEach((shape)=>{
+    shape.push(shape[0]);
+  })
+
+  console.log(newpoints)
+})
+
+d3.select('svg').on('click',()=>{
+  let {x,y} = d3.event
+  console.log([x-centerX,y-centerY])//need to SCALE UP THE NEWPOINTS FOR THE CLICK LOCATION
+  newpoints.forEach((zone)=>{
+    console.log(d3.polygonContains(zone,[x-centerX,y-centerY]))
+  })
+})
 
 svg.append('line')
   .attr('x1', _ => 20)
