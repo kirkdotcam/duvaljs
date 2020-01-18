@@ -14,8 +14,7 @@ let maxGasScale = 40; //as defined by paper, no gas concentration will likely ri
 
 let zonepoints = d3.json('./pentagonreverse.json')
   .then((res) => {
-    globalPoints = res
-    // drawZones(res)
+    drawZones(res)
   });
 
 
@@ -49,21 +48,28 @@ function drawFrame() {
 }
 
 function drawZones(zoneSet) {
-  
+
   let lineFunction = d3.line()
-    .x(d => d.x * (radius/maxGasScale) + centerX)
-    .y(d => -d.y *(radius/maxGasScale)+ centerY);
+    .x(d => d[0])
+    .y(d => d[1]);
 
   for (const key in zoneSet) {
-    zoneSet[key].push(zoneSet[key][0])
-    svg.append("path")
-    .attr("d", lineFunction(zoneSet[key]))
-    .attr("stroke","black")
-    .attr("stroke-width", 3)
-    .attr("fill", "none");
-  }
+    zoneSet[key] = zoneSet[key].map(point => {
+      return [
+        point.x * (radius / maxGasScale) + centerX,
+        -point.y * (radius / maxGasScale) + centerY
+      ]
+    })
 
-  console.log(zoneSet)
+    svg.append("path")
+      .attr("d", lineFunction(zoneSet[key]))
+      .attr("stroke", "green")
+      .attr("stroke-width", 1.5)
+      .attr("fill", "none");
+
+    globalPoints[key] = zoneSet[key];
+
+  }
 
 }
 
@@ -71,58 +77,42 @@ function drawPoint() {
 
 }
 
+function calcCentroid() {
+
+}
+
 let newpoints = []
 
-//transform zonepoints
-zonepoints.then(() => {
-  
-  newpoints = Object.values(globalPoints).map((shape) => {
-    return shape.map((point) => {
-      return Object.values(point)
-    })
-  })
+// //transform zonepoints
+// zonepoints.then(() => {
 
-  newpoints.forEach((shape) => {
-    shape.push(shape[0]);
-  })
+//   newpoints = Object.values(globalPoints).map((shape) => {
+//     return shape.map((point) => {
+//       return Object.values(point)
+//     })
+//   })
 
-  newpoints = newpoints.map((shape)=>{
+//   newpoints = newpoints.map((shape)=>{
 
-    return shape.map(point=>{
-      return [
-        point[0] * (radius/maxGasScale) + centerX,
-        -point[1] * (radius/maxGasScale) + centerY
-      ]
-    })
+//     return shape.map(point=>{
+//       return [
+//         point[0] * (radius/maxGasScale) + centerX,
+//         -point[1] * (radius/maxGasScale) + centerY
+//       ]
+//     })
 
-  })
-  console.log(newpoints)
+//   })
+//   console.log(newpoints)
 
-
-
-let lineFunction2 = d3.line()
-.x(d => d[0])
-.y(d => d[1]);
-
-  newpoints.forEach(shape =>{
-    svg.append("path")
-    .attr("d", lineFunction2(shape))
-    .attr("stroke","green")
-    .attr("stroke-width", 3)
-    .attr("fill", "none");
-  })
-})
 
 //need to convert pixels of click back to area of pentagon, or areas of pentagon to click
 d3.select('svg').on('click', () => {
   let { x, y } = d3.event
-  console.log("pixels", x, y);
-  console.log(x*(radius/maxGasScale)-centerX)
-  let i = 0;
-  console.log("relative to pentagon", [x - centerX, y - centerY])//need to SCALE UP THE NEWPOINTS FOR THE CLICK LOCATION
-  newpoints.forEach((zone) => {
-    console.log(i,d3.polygonContains(zone, [x,y])) //polygoncontains broken due to change of coordinate system
-    ++i
+  console.clear()
+  console.log(x,y);
+  console.log(Object.entries(globalPoints))
+  Object.entries(globalPoints).forEach((zone) => {
+    console.log(zone[0], d3.polygonContains(zone[1], [x, y])) //polygoncontains broken due to change of coordinate system
   })
 })
 
