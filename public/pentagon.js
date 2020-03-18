@@ -54,75 +54,55 @@ function drawZones(zoneSet) {
     .y(d => d[1]);
 
   for (const key in zoneSet) {
-    zoneSet[key] = zoneSet[key].map(point => {
+    globalPoints[key] = zoneSet[key].map(point => {
       return [
         point.x * (radius / maxGasScale) + centerX,
-        -point.y * (radius / maxGasScale) + centerY
+        -1 * point.y * (radius / maxGasScale) + centerY
       ]
     })
 
     svg.append("path")
-      .attr("d", lineFunction(zoneSet[key]))
-      .attr("stroke", "green")
+      .attr("d", lineFunction(globalPoints[key]))
+      .attr("stroke", "blue")
       .attr("stroke-width", 1.5)
       .attr("fill", "none");
 
-    globalPoints[key] = zoneSet[key];
-
   }
+
+  console.log(zoneSet)
+  console.log(globalPoints)
 
 }
 
-function drawPoint() {
-
+function drawPoint(x,y) {
+  svg.append("circle")
+    .attr("cx",x)
+    .attr("cy",y)
+    .attr("r",1.5)
 }
 
 function calcCentroid() {
 
 }
 
-let newpoints = []
-
-// //transform zonepoints
-// zonepoints.then(() => {
-
-//   newpoints = Object.values(globalPoints).map((shape) => {
-//     return shape.map((point) => {
-//       return Object.values(point)
-//     })
-//   })
-
-//   newpoints = newpoints.map((shape)=>{
-
-//     return shape.map(point=>{
-//       return [
-//         point[0] * (radius/maxGasScale) + centerX,
-//         -point[1] * (radius/maxGasScale) + centerY
-//       ]
-//     })
-
-//   })
-//   console.log(newpoints)
-
+function determineZone(x,y) {
+  Object.entries(globalPoints).forEach((zone) => {
+    console.log(zone[0], d3.polygonContains(zone[1], [x, y]));
+  })
+}
 
 //need to convert pixels of click back to area of pentagon, or areas of pentagon to click
-d3.select('svg').on('click', () => {
-  let { x, y } = d3.event
-  console.clear()
-  console.log(x,y);
-  console.log(Object.entries(globalPoints))
-  Object.entries(globalPoints).forEach((zone) => {
-    console.log(zone[0], d3.polygonContains(zone[1], [x, y])) //polygoncontains broken due to change of coordinate system
-  })
-})
+d3.select('svg').on('mousedown', () => {
 
-svg.append('line')
-  .attr('x1', _ => 20)
-  .attr('y1', _ => 20)
-  .attr('x2', _ => 250)
-  .attr('y2', _ => 250)
-  .attr('stroke', 'red')
-  .attr('stroke-width', 3);
+  let { x, y } = d3.event
+  x = x-10
+  y = y-10
+  console.clear();
+  console.log(x,y);
+  console.log(Object.entries(globalPoints));
+  drawPoint(x,y)
+  determineZone(x,y);
+})
 
 // https://bl.ocks.org/curran/8b4b7791fc25cfd2c459e74f3d0423f2
 
