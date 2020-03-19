@@ -94,24 +94,23 @@ function gasPercentToCoordinate(percentAngleObject){
 function calcCentroid(gasPercentArray) {
 
   // calc surface area
-  gasPercentArray.map((curr,idx)=>{
+  let surfaceArea = gasPercentArray.map((curr,idx)=>{
     return {
       r:curr,
       angle:frameAngles[idx]
     }
   }).reduce((acc,curr,idx,src)=>{
-    let [x1,y1] = gasPercentToCoordinate(curr);
-    
+    let [x1,y1] = gasPercentToCoordinate(curr);    
     let nextRef = idx === src.length ? 0 : idx+1;
-
     let [x2,y2] = gasPercentToCoordinate(src[nextRef]);
     
     return acc + (x1*y2 - x2*y1)
 
-  })
-  
-
+  });
+  surfaceArea = surfaceArea/2
   // calc x and y
+
+  
 
 }
 
