@@ -94,23 +94,43 @@ function gasPercentToCoordinate(percentAngleObject){
 function calcCentroid(gasPercentArray) {
 
   // calc surface area
-  let surfaceArea = gasPercentArray.map((curr,idx)=>{
+  let coordinates = gasPercentArray.map((curr,idx)=>{
     return {
       r:curr,
       angle:frameAngles[idx]
     }
-  }).reduce((acc,curr,idx,src)=>{
-    let [x1,y1] = gasPercentToCoordinate(curr);    
-    let nextRef = idx === src.length ? 0 : idx+1;
-    let [x2,y2] = gasPercentToCoordinate(src[nextRef]);
+  }).map(curr => gasPercentToCoordinate(curr));
+  
+  
+  let surfaceArea = (1/2) * coordinates.reduce((acc,curr,idx,src)=>{
+    let [x1,y1] = curr
+    let nextRef = idx === src.length-1 ? 0 : idx+1;
+    let [x2,y2] = src[nextRef];
     
     return acc + (x1*y2 - x2*y1)
 
   });
-  surfaceArea = surfaceArea/2
   // calc x and y
 
-  
+  const cx = (1/6*surfaceArea) * coordinates.reduce((acc,curr,idx,src)=>{
+    let [x1,y1] = curr;
+    let nextRef = idx === src.length-1 ? 0 : idx+1;
+    let [x2,y2] = src[nextRef];
+
+    let summand = (x1+x2)*(x1*y2 - x2*y1);
+    return acc + summand;
+  })
+
+  const cy = (1/6*surfaceArea) * coordinates.reduce((acc,curr,idx,src)=>{
+    let [x1,y1] = curr;
+    let nextRef = idx === src.length-1 ? 0 : idx+1;
+    let [x2,y2] = src[nextRef];
+
+    let summand = (y1+y2)*(x1*y2 - x2*y1);
+    return acc + summand;
+  })
+
+  return [cx,cy];
 
 }
 
