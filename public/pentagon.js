@@ -87,12 +87,16 @@ function gasPercentToCoordinate(percentAngleObject){
 
   let x = percentAngleObject.r * Math.cos(percentAngleObject.angle);
   let y = percentAngleObject.r * Math.cos((Math.PI/2)-percentAngleObject.angle);
+
+
+
   return [x,y]
 
 }
 
 function calcCentroid(gasPercentArray) {
-
+  
+  
   // calc surface area
   let coordinates = gasPercentArray.map((curr,idx)=>{
     return {
@@ -102,15 +106,20 @@ function calcCentroid(gasPercentArray) {
   }).map(curr => gasPercentToCoordinate(curr));
   
   
+  
+  
   let surfaceArea = (1/2) * coordinates.reduce((acc,curr,idx,src)=>{
     let [x1,y1] = curr
     let nextRef = idx === src.length-1 ? 0 : idx+1;
     let [x2,y2] = src[nextRef];
     
-    return acc + (x1*y2 - x2*y1)
+    return acc + parseFloat(x1*y2 - x2*y1)
 
-  });
-  // calc x and y
+  },0);
+
+
+  
+  // TODO: radii need to be scaled back to size of plot for these and for surfaceArea
 
   const cx = (1/6*surfaceArea) * coordinates.reduce((acc,curr,idx,src)=>{
     let [x1,y1] = curr;
@@ -119,7 +128,7 @@ function calcCentroid(gasPercentArray) {
 
     let summand = (x1+x2)*(x1*y2 - x2*y1);
     return acc + summand;
-  })
+  },0)
 
   const cy = (1/6*surfaceArea) * coordinates.reduce((acc,curr,idx,src)=>{
     let [x1,y1] = curr;
@@ -127,8 +136,10 @@ function calcCentroid(gasPercentArray) {
     let [x2,y2] = src[nextRef];
 
     let summand = (y1+y2)*(x1*y2 - x2*y1);
+    // console.log(x1,y1,x2,y2);
+    
     return acc + summand;
-  })
+  },0)
 
   return [cx,cy];
 
@@ -142,10 +153,17 @@ function determineZone(x,y) {
   })
 }
 function formSubmit(){
-  let form = d3.selectAll("input")
-  form.each((d,i,nodes)=>{
-    console.log(nodes[i].value)
+  let values = [];
+  d3.selectAll("input").each((d,i,nodes)=>{
+    values.push(nodes[i].value)
   })
+  let centroid = calcCentroid(values);
+  
+  console.log(centroid);
+  
+  determineZone(...centroid);
+  drawPoint(...centroid);
+
 
 }
 
