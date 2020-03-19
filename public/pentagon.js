@@ -82,7 +82,17 @@ function drawPoint(x,y) {
     .attr("r",1.5)
 }
 
+
+function gasPercentToCoordinate(percentAngleObject){
+
+  let x = percentAngleObject.r * Math.cos(percentAngleObject.angle);
+  let y = percentAngleObject.r * Math.cos((Math.PI/2)-percentAngleObject.angle);
+  return [x,y]
+
+}
+
 function calcCentroid(gasPercentArray) {
+
   // calc surface area
   gasPercentArray.map((curr,idx)=>{
     return {
@@ -90,15 +100,12 @@ function calcCentroid(gasPercentArray) {
       angle:frameAngles[idx]
     }
   }).reduce((acc,curr,idx,src)=>{
-    let x1 = curr.r * Math.cos(curr.angle);
-    let y1 = curr.r * Math.cos((Math.PI/2)-curr.angle);
-
-
+    let [x1,y1] = gasPercentToCoordinate(curr);
+    
     let nextRef = idx === src.length ? 0 : idx+1;
 
-    let x2 = src[nextRef] * Math.cos(curr.angle);
-    let y2 = src[nextRef] * Math.cos((Math.PI/2)-curr.angle);
-
+    let [x2,y2] = gasPercentToCoordinate(src[nextRef]);
+    
     return acc + (x1*y2 - x2*y1)
 
   })
