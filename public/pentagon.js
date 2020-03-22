@@ -26,6 +26,7 @@ function drawFrame() {
     .map(i => {
 
       let angle = i / numSides * (Math.PI * 2) + Math.PI;
+
       frameAngles.push(angle); 
 
       return [
@@ -34,7 +35,8 @@ function drawFrame() {
       ];
 
     });
-
+    console.log(segments);
+    
   segments.push(segments[0]);
 
   let lineFunction = d3.line()
@@ -70,16 +72,14 @@ function drawZones(zoneSet) {
 
   }
 
-  // console.log(zoneSet)
-  // console.log(globalPoints)
-
 }
 
-function drawPoint(x,y) {
+function drawPoint(x,y,color) {
   svg.append("circle")
+    .attr("stroke",color? color:"black")
     .attr("cx",x)
     .attr("cy",y)
-    .attr("r",1.5)
+    .attr("r",1.5);
 }
 
 
@@ -88,25 +88,20 @@ function gasPercentToCoordinate(percentAngleObject){
   let x = percentAngleObject.r * Math.cos(percentAngleObject.angle);
   let y = percentAngleObject.r * Math.cos((Math.PI/2)-percentAngleObject.angle);
 
-
-
-  return [x,y]
+  console.log(percentAngleObject)
+  return [x,y];
 
 }
 
 function calcCentroid(gasPercentArray) {
-  
-  
+    
   // calc surface area
-  let coordinates = gasPercentArray.map((curr,idx)=>{
+  let coordinates = Object.values(gasPercentArray).map((curr,idx)=>{
     return {
-      r:curr,
+      r:curr.value,
       angle:frameAngles[idx]
     }
   }).map(curr => gasPercentToCoordinate(curr));
-  
-  
-  
   
   let surfaceArea = (1/2) * coordinates.reduce((acc,curr,idx,src)=>{
     let [x1,y1] = curr
@@ -119,7 +114,7 @@ function calcCentroid(gasPercentArray) {
 
 
   
-  // TODO: radii need to be scaled back to size of plot for these and for surfaceArea
+  // TODO: radii need to be scaled back to size of plot for these and for surfaceArea. also need to slide final x, y by same as center of frame
 
   const cx = (1/6*surfaceArea) * coordinates.reduce((acc,curr,idx,src)=>{
     let [x1,y1] = curr;
@@ -136,7 +131,6 @@ function calcCentroid(gasPercentArray) {
     let [x2,y2] = src[nextRef];
 
     let summand = (y1+y2)*(x1*y2 - x2*y1);
-    // console.log(x1,y1,x2,y2);
     
     return acc + summand;
   },0)
@@ -152,10 +146,16 @@ function determineZone(x,y) {
     }
   })
 }
+
 function formSubmit(){
   let values = [];
+
+  // TODO: push an object with gas ID and value instead
   d3.selectAll("input").each((d,i,nodes)=>{
-    values.push(nodes[i].value)
+    values.push({
+      "value":nodes[i].value,
+      "gas":nodes[i].name
+    })
   })
   let centroid = calcCentroid(values);
   
@@ -163,8 +163,6 @@ function formSubmit(){
   
   determineZone(...centroid);
   drawPoint(...centroid);
-
-
 }
 
 // d3.select('#submission').on('click', () =>{
