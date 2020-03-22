@@ -11,11 +11,12 @@ let numSides = 5;
 let radius = height / 4;
 let globalPoints = {};
 let maxGasScale = 40; //as defined by paper, no gas concentration will likely rise above 40%
-let frameAngles = [];
+let frameAngles = {};
 let zonepoints = d3.json('./pentagonreverse.json')
   .then((res) => {
     drawZones(res)
   });
+let gasNames = ["hydrogen","ethane","methane","ethene","ethyne"]
 
 
 drawFrame();
@@ -27,7 +28,7 @@ function drawFrame() {
 
       let angle = i / numSides * (Math.PI * 2) + Math.PI;
 
-      frameAngles.push(angle); 
+      frameAngles[gasNames[i]] = angle; 
 
       return [
         Math.sin(angle) * radius + centerX,
@@ -35,7 +36,7 @@ function drawFrame() {
       ];
 
     });
-    console.log(segments);
+  
     
   segments.push(segments[0]);
 
@@ -48,6 +49,8 @@ function drawFrame() {
     .attr("stroke", "blue")
     .attr("stroke-width", 3)
     .attr("fill", "none");
+
+  
 }
 
 function drawZones(zoneSet) {
@@ -75,6 +78,8 @@ function drawZones(zoneSet) {
 }
 
 function drawPoint(x,y,color) {
+  console.log(x,y);
+  
   svg.append("circle")
     .attr("stroke",color? color:"black")
     .attr("cx",x)
@@ -85,10 +90,13 @@ function drawPoint(x,y,color) {
 
 function gasPercentToCoordinate(percentAngleObject){
 
-  let x = percentAngleObject.r * Math.cos(percentAngleObject.angle);
-  let y = percentAngleObject.r * Math.cos((Math.PI/2)-percentAngleObject.angle);
-
-  console.log(percentAngleObject)
+  let y = -1 * (percentAngleObject.r/maxGasScale) * Math.cos(percentAngleObject.angle);
+  let x = (percentAngleObject.r/maxGasScale) * Math.cos((Math.PI/2)-percentAngleObject.angle);
+  // x+= centerX;
+  // y+= centerY;
+  drawPoint(x,y,"red")
+  console.log(percentAngleObject,x,y)
+  
   return [x,y];
 
 }
@@ -99,9 +107,12 @@ function calcCentroid(gasPercentArray) {
   let coordinates = Object.values(gasPercentArray).map((curr,idx)=>{
     return {
       r:curr.value,
-      angle:frameAngles[idx]
+      angle:frameAngles[curr.gas],
+      gas:curr.gas
     }
   }).map(curr => gasPercentToCoordinate(curr));
+  
+  console.log(coordinates);
   
   let surfaceArea = (1/2) * coordinates.reduce((acc,curr,idx,src)=>{
     let [x1,y1] = curr
@@ -118,7 +129,7 @@ function calcCentroid(gasPercentArray) {
 
   const cx = (1/6*surfaceArea) * coordinates.reduce((acc,curr,idx,src)=>{
     let [x1,y1] = curr;
-    let nextRef = idx === src.length-1 ? 0 : idx+1;
+    let nextRef = (idx === src.length-1) ? 0 : idx+1;
     let [x2,y2] = src[nextRef];
 
     let summand = (x1+x2)*(x1*y2 - x2*y1);
@@ -127,7 +138,7 @@ function calcCentroid(gasPercentArray) {
 
   const cy = (1/6*surfaceArea) * coordinates.reduce((acc,curr,idx,src)=>{
     let [x1,y1] = curr;
-    let nextRef = idx === src.length-1 ? 0 : idx+1;
+    let nextRef = (idx === src.length-1) ? 0 : idx+1;
     let [x2,y2] = src[nextRef];
 
     let summand = (y1+y2)*(x1*y2 - x2*y1);
@@ -165,9 +176,6 @@ function formSubmit(){
   drawPoint(...centroid);
 }
 
-// d3.select('#submission').on('click', () =>{
-
-// })
 //need to convert pixels of click back to area of pentagon, or areas of pentagon to click
 d3.select('svg').on('mousedown', () => {
   console.clear();
