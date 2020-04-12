@@ -90,8 +90,8 @@ function drawPoint(x,y,color) {
 
 function gasPercentToCoordinate(percentAngleObject){
 
-  let y = -1 * (percentAngleObject.r/maxGasScale) * Math.cos(percentAngleObject.angle);
-  let x = (percentAngleObject.r/maxGasScale) * Math.cos((Math.PI/2)-percentAngleObject.angle);
+  let y = -1 * (percentAngleObject.r) * Math.cos(percentAngleObject.angle);
+  let x = (percentAngleObject.r) * Math.cos((Math.PI/2)-percentAngleObject.angle);
   // x+= centerX;
   // y+= centerY;
   drawPoint(x,y,"red")
