@@ -78,7 +78,7 @@ function drawZones(zoneSet) {
 }
 
 function drawPoint(x,y,color) {
-  console.log(x,y);
+  // console.log(x,y);
   
   svg.append("circle")
     .attr("stroke",color? color:"black")
@@ -92,17 +92,26 @@ function gasPercentToCoordinate(percentAngleObject){
 
   let y = -1 * (percentAngleObject.r) * Math.cos(percentAngleObject.angle);
   let x = (percentAngleObject.r) * Math.cos((Math.PI/2)-percentAngleObject.angle);
+<<<<<<< HEAD
   // x+= centerX;
   // y+= centerY;
+=======
+  // ONLY RETURN THE coordinates of the non-scaled plot here
+
+>>>>>>> fe1d557913f45b27f81ae78aa2a9f1762578a2eb
   drawPoint(x,y,"red")
   console.log(percentAngleObject,x,y)
   
-  return [x,y];
+  return {
+    x,
+    y,
+    ...percentAngleObject
+  };
 
 }
 
 function calcCentroid(gasPercentArray) {
-    
+  
   // calc surface area
   let coordinates = Object.values(gasPercentArray).map((curr,idx)=>{
     return {
@@ -114,6 +123,9 @@ function calcCentroid(gasPercentArray) {
   
   console.log(coordinates);
   
+  //surface area broken because order wasn't preserved in map of coordinates
+
+  //try looping over gasNames instead of coordinates here to force preserve order. Need to rewrite gasPercentToCoordinate to return object, then seek through list of objects to grab gas by name
   let surfaceArea = (1/2) * coordinates.reduce((acc,curr,idx,src)=>{
     let [x1,y1] = curr
     let nextRef = idx === src.length-1 ? 0 : idx+1;
@@ -124,6 +136,7 @@ function calcCentroid(gasPercentArray) {
   },0);
 
 
+  console.log(surfaceArea);
   
   // TODO: radii need to be scaled back to size of plot for these and for surfaceArea. also need to slide final x, y by same as center of frame
 
