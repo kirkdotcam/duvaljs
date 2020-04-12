@@ -61,10 +61,7 @@ function drawZones(zoneSet) {
 
   for (const key in zoneSet) {
     globalPoints[key] = zoneSet[key].map(point => {
-      return [
-        point.x * (radius / maxGasScale) + centerX,
-        -1 * point.y * (radius / maxGasScale) + centerY
-      ]
+      return scaleCoordToPixels(point.x, point.y)
     })
 
     svg.append("path")
@@ -77,36 +74,6 @@ function drawZones(zoneSet) {
 
 }
 
-function drawPoint(x,y,color) {
-  // console.log(x,y);
-  
-  svg.append("circle")
-    .attr("stroke",color? color:"black")
-    .attr("cx",x)
-    .attr("cy",y)
-    .attr("r",1.5);
-}
-
-
-function gasPercentToCoordinate(percentAngleObject){
-
-  let y = -1 * (percentAngleObject.r) * Math.cos(percentAngleObject.angle);
-  let x = (percentAngleObject.r) * Math.cos((Math.PI/2)-percentAngleObject.angle);
-  // x+= centerX;
-  // y+= centerY;
-  // ONLY RETURN THE coordinates of the non-scaled plot here
-
-  drawPoint(x,y,"red")
-  console.log(percentAngleObject,x,y)
-  
-  return {
-    x,
-    y,
-    ...percentAngleObject
-  };
-
-}
-
 function extractCoordinate(target, coordinateList){
   const targetObject = coordinateList.find( ({gas}) => gas===target);  
   return [targetObject.x,targetObject.y]
@@ -114,6 +81,32 @@ function extractCoordinate(target, coordinateList){
 
 function scaleCoordToPixels(x,y){
   return [x * (radius/maxGasScale) + centerX, -1 * y * (radius/maxGasScale) + centerY]
+}
+
+function drawPoint(x,y,color) {  
+  svg.append("circle")
+    .attr("stroke",color? color:"black")
+    .attr("cx",x)
+    .attr("cy",y)
+    .attr("r",1.5);
+}
+
+function gasPercentToCoordinate(percentAngleObject){
+
+  let y = -1 * (percentAngleObject.r) * Math.cos(percentAngleObject.angle);
+  let x = (percentAngleObject.r) * Math.cos((Math.PI/2)-percentAngleObject.angle);
+
+  // ONLY RETURN THE coordinates of the non-scaled plot here
+
+  drawPoint(...scaleCoordToPixels(x,y),"red"); //looks gross, may remove
+  
+  
+  return {
+    x,
+    y,
+    ...percentAngleObject
+  };
+
 }
 
 function calcCentroid(gasPercentArray) {
@@ -127,13 +120,9 @@ function calcCentroid(gasPercentArray) {
     }
   }).map(curr => gasPercentToCoordinate(curr));
   
-  console.log(coordObjList);
-  
   //surface area broken because order wasn't preserved in map of coordinates
 
-  //try looping over gasNames instead of coordinates here to force preserve order. Need to rewrite gasPercentToCoordinate to return object, then seek through list of objects to grab gas by name
   let surfaceArea = (1/2) * gasNames.reduce((acc,curr,idx,src)=>{
-    
     
     let [x1,y1] = extractCoordinate(curr,coordObjList);
     let nextRef = idx === src.length-1 ? 0 : idx+1;
@@ -142,8 +131,6 @@ function calcCentroid(gasPercentArray) {
     return acc + parseFloat(x1*y2 - x2*y1)
 
   },0);
-  
-  // TODO: radii need to be scaled back to size of plot for these and for surfaceArea. also need to slide final x, y by same as center of frame
 
   const cx = (1/(6*surfaceArea)) * gasNames.reduce((acc,curr,idx,src)=>{
     let [x1,y1] = extractCoordinate(curr,coordObjList);
@@ -165,7 +152,7 @@ function calcCentroid(gasPercentArray) {
   },0)
   
   
-  return [cx*(radius/maxGasScale)+centerX , -1*cy*(radius/maxGasScale)+centerY];
+  return scaleCoordToPixels(cx, cy);
 
 }
 
@@ -180,7 +167,6 @@ function determineZone(x,y) {
 function formSubmit(){
   let values = [];
 
-  // TODO: push an object with gas ID and value instead
   d3.selectAll("input").each((d,i,nodes)=>{
     values.push({
       "value":nodes[i].value,
@@ -188,8 +174,6 @@ function formSubmit(){
     })
   })
   let centroid = calcCentroid(values);
-  
-  console.log(centroid);
   
   determineZone(...centroid);
   drawPoint(...centroid);
