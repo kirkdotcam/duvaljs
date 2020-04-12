@@ -92,13 +92,10 @@ function gasPercentToCoordinate(percentAngleObject){
 
   let y = -1 * (percentAngleObject.r) * Math.cos(percentAngleObject.angle);
   let x = (percentAngleObject.r) * Math.cos((Math.PI/2)-percentAngleObject.angle);
-<<<<<<< HEAD
   // x+= centerX;
   // y+= centerY;
-=======
   // ONLY RETURN THE coordinates of the non-scaled plot here
 
->>>>>>> fe1d557913f45b27f81ae78aa2a9f1762578a2eb
   drawPoint(x,y,"red")
   console.log(percentAngleObject,x,y)
   
@@ -110,10 +107,19 @@ function gasPercentToCoordinate(percentAngleObject){
 
 }
 
+function extractCoordinate(target, coordinateList){
+  const targetObject = coordinateList.find( ({gas}) => gas===target);  
+  return [targetObject.x,targetObject.y]
+}
+
+function scaleCoordToPixels(x,y){
+  return [x * (radius/maxGasScale) + centerX, -1 * y * (radius/maxGasScale) + centerY]
+}
+
 function calcCentroid(gasPercentArray) {
   
   // calc surface area
-  let coordinates = Object.values(gasPercentArray).map((curr,idx)=>{
+  let coordObjList = Object.values(gasPercentArray).map((curr,idx)=>{
     return {
       r:curr.value,
       angle:frameAngles[curr.gas],
@@ -121,45 +127,45 @@ function calcCentroid(gasPercentArray) {
     }
   }).map(curr => gasPercentToCoordinate(curr));
   
-  console.log(coordinates);
+  console.log(coordObjList);
   
   //surface area broken because order wasn't preserved in map of coordinates
 
   //try looping over gasNames instead of coordinates here to force preserve order. Need to rewrite gasPercentToCoordinate to return object, then seek through list of objects to grab gas by name
-  let surfaceArea = (1/2) * coordinates.reduce((acc,curr,idx,src)=>{
-    let [x1,y1] = curr
+  let surfaceArea = (1/2) * gasNames.reduce((acc,curr,idx,src)=>{
+    
+    
+    let [x1,y1] = extractCoordinate(curr,coordObjList);
     let nextRef = idx === src.length-1 ? 0 : idx+1;
-    let [x2,y2] = src[nextRef];
+    let [x2,y2] = extractCoordinate(src[nextRef],coordObjList);
     
     return acc + parseFloat(x1*y2 - x2*y1)
 
   },0);
-
-
-  console.log(surfaceArea);
   
   // TODO: radii need to be scaled back to size of plot for these and for surfaceArea. also need to slide final x, y by same as center of frame
 
-  const cx = (1/6*surfaceArea) * coordinates.reduce((acc,curr,idx,src)=>{
-    let [x1,y1] = curr;
-    let nextRef = (idx === src.length-1) ? 0 : idx+1;
-    let [x2,y2] = src[nextRef];
+  const cx = (1/(6*surfaceArea)) * gasNames.reduce((acc,curr,idx,src)=>{
+    let [x1,y1] = extractCoordinate(curr,coordObjList);
+    let nextRef = idx === src.length-1 ? 0 : idx+1;
+    let [x2,y2] = extractCoordinate(src[nextRef],coordObjList);
 
     let summand = (x1+x2)*(x1*y2 - x2*y1);
     return acc + summand;
   },0)
 
-  const cy = (1/6*surfaceArea) * coordinates.reduce((acc,curr,idx,src)=>{
-    let [x1,y1] = curr;
-    let nextRef = (idx === src.length-1) ? 0 : idx+1;
-    let [x2,y2] = src[nextRef];
+  const cy = (1/(6*surfaceArea)) * gasNames.reduce((acc,curr,idx,src)=>{
+    let [x1,y1] = extractCoordinate(curr,coordObjList);
+    let nextRef = idx === src.length-1 ? 0 : idx+1;
+    let [x2,y2] = extractCoordinate(src[nextRef],coordObjList);
 
     let summand = (y1+y2)*(x1*y2 - x2*y1);
     
     return acc + summand;
   },0)
-
-  return [cx,cy];
+  
+  
+  return [cx*(radius/maxGasScale)+centerX , -1*cy*(radius/maxGasScale)+centerY];
 
 }
 
