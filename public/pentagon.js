@@ -136,7 +136,7 @@ function calcCentroid(gasPercentArray) {
     let [x2,y2] = src[nextRef];
 
     let summand = (y1+y2)*(x1*y2 - x2*y1);
-    // console.log(x1,y1,x2,y2);
+
     
     return acc + summand;
   },0)
