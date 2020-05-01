@@ -98,7 +98,7 @@ function gasPercentToCoordinate(percentAngleObject){
 
   // ONLY RETURN THE coordinates of the non-scaled plot here
 
-  drawPoint(...scaleCoordToPixels(x,y),"red"); //looks gross, may remove
+  //drawPoint(...scaleCoordToPixels(x,y),"red"); //looks gross, may remove
   
   
   return {
@@ -176,9 +176,13 @@ function formSubmit(){
   let centroid = calcCentroid(values);
   
   determineZone(...centroid);
+
   drawPoint(...centroid);
 }
 
+function cleardots(){
+  d3.selectAll("circle").remove();
+}
 //need to convert pixels of click back to area of pentagon, or areas of pentagon to click
 d3.select('svg').on('mousedown', () => {
   console.clear();
