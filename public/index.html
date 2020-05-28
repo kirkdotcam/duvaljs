@@ -1,26 +1,44 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-        <script src="https://d3js.org/d3.v5.min.js"></script>
-        <link rel="stylesheet" href="stylesheet.css">
-        <title></title>
-      </head>
-      <body>
-        <div id="graph"></div>
-        <!-- <script src="main.js"></script> -->
-    <script src="pentagon.js"></script>
 
-    <form id="form" onsubmit="formSubmit()">
-      <label for="meth">Methane: </label><input type="number" name="methane" value=50 id="meth">
-      <label for="ethane">Ethane: </label><input type="number" name="ethane" value=34 id="ethane">
-      <label for="ethene">Ethylene: </label><input type="number" name="ethene" value=8 id="ethene">
-      <label for="ethyne">Acetylene: </label><input type="number" name="ethyne" value=0 id="ethyne">
-      <label for="hydro">Hydrogen: </label><input type="number" name="hydrogen" value=8 id="hydro">
+<head>
+  <meta charset="utf-8">
+  <!-- cdn -->
+  <script async src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <link async rel="stylesheet" href="stylesheet.css">
+  <title></title>
+</head>
+
+<body>
+
+  <section id="graphSection">
+    <div id="graph"></div>
+    <!-- <script src="main.js"></script> -->
+
+  </section>
+
+  <section id="formSection">
+    <form id="form">
+      <br><label for="meth">Methane: </label><input type="number" name="methane" value=50 id="meth">
+      <br><label for="ethane">Ethane: </label><input type="number" name="ethane" value=34 id="ethane">
+      <br><label for="ethene">Ethylene: </label><input type="number" name="ethene" value=8 id="ethene">
+      <br><label for="ethyne">Acetylene: </label><input type="number" name="ethyne" value=0 id="ethyne">
+      <br><label for="hydro">Hydrogen: </label><input type="number" name="hydrogen" value=8 id="hydro">
+      <button id="cleardots" onclick="cleardots()">Remove Points</button>
       <button id="submission" type="button" onclick="formSubmit()">Submit</button>
     </form>
-    <button id="cleardots" onclick="cleardots()">Remove Points</button>
+  </section>
+  
+  <aside id="resultArea">
+    <h1>Results</h1>
+    <p>Classification:</p>
+    <p id="pentagonFaultClass">Submit form</p>
+  </aside>
 
-  </body>
+  
+  <!-- userlib -->
+  <script defer src="pentagon.js"></script>
+</body>
+
 </html>

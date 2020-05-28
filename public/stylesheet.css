@@ -1,0 +1,18 @@
+body{
+    display:flex;
+}
+
+aside{
+    float:right;
+    width:15%;
+    margin-left: 10px;
+    background: gray;
+}
+
+#graphSection{
+    width:60%
+}
+
+#formSection{
+    width:25%
+}

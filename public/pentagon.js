@@ -1,4 +1,4 @@
-let svg = d3.select('body')
+let svg = d3.select('#graph')
   .append('svg')
   .attr("width", 300)
   .attr("height", 300);
@@ -98,9 +98,7 @@ function gasPercentToCoordinate(percentAngleObject){
 
   // ONLY RETURN THE coordinates of the non-scaled plot here
 
-  //drawPoint(...scaleCoordToPixels(x,y),"red"); //looks gross, may remove
-  
-  
+  drawPoint(...scaleCoordToPixels(x,y),"red"); //looks gross, may remove
   return {
     x,
     y,
@@ -157,13 +155,16 @@ function calcCentroid(gasPercentArray) {
 }
 
 function determineZone(x,y) {
-  Object.entries(globalPoints).forEach((zone) => {
+  const validZones =  Object.entries(globalPoints).filter((zone) => {
     if (d3.polygonContains(zone[1], [x, y])){
-      console.log(zone[0])
+      return true;
     }
-  })
+  });
+
+  return validZones.length >= 1 ? validZones[0][0] : "No valid class"
 }
 
+// need to preventdefault
 function formSubmit(){
   let values = [];
 
@@ -171,26 +172,28 @@ function formSubmit(){
     values.push({
       "value":nodes[i].value,
       "gas":nodes[i].name
-    })
+    });
   })
   let centroid = calcCentroid(values);
   
-  determineZone(...centroid);
-
+  let zone = determineZone(...centroid);
   drawPoint(...centroid);
+
+  d3.select("#pentagonFaultClass").text(zone);
+
 }
 
 function cleardots(){
   d3.selectAll("circle").remove();
 }
-//need to convert pixels of click back to area of pentagon, or areas of pentagon to click
+
 d3.select('svg').on('mousedown', () => {
   console.clear();
 
-  let { x, y } = d3.event
-  determineZone(x,y);
-  x = x-10
-  y = y-10
+  let { x, y } = d3.event;
+  console.log(determineZone(x,y));
+  x = x-10;
+  y = y-10;
   drawPoint(x,y);
 })
 
