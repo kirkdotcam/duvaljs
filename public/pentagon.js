@@ -103,8 +103,6 @@ function gasPercentToCoordinate(percentAngleObject){
 
 }
 
-
-
 function calcCentroid(gasPercentArray) {
   
   let coordObjList = Object.values(gasPercentArray).map((curr,idx)=>{
@@ -193,5 +191,5 @@ d3.select('svg').on('mousedown', () => {
   drawPoint(x,y);
 })
 
-// https://bl.ocks.org/curran/8b4b7791fc25cfd2c459e74f3d0423f2
+// based off of https://bl.ocks.org/curran/8b4b7791fc25cfd2c459e74f3d0423f2
 
