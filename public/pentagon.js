@@ -18,7 +18,6 @@ let zonepoints = d3.json('./pentagonreverse.json')
   });
 let gasNames = ["hydrogen","ethane","methane","ethene","ethyne"]
 
-
 drawFrame();
 
 function drawFrame() {
@@ -36,8 +35,6 @@ function drawFrame() {
       ];
 
     });
-  
-    
   segments.push(segments[0]);
 
   let lineFunction = d3.line()
@@ -95,10 +92,9 @@ function gasPercentToCoordinate(percentAngleObject){
 
   let y = -1 * (percentAngleObject.r) * Math.cos(percentAngleObject.angle);
   let x = (percentAngleObject.r) * Math.cos((Math.PI/2)-percentAngleObject.angle);
-
   // ONLY RETURN THE coordinates of the non-scaled plot here
 
-  drawPoint(...scaleCoordToPixels(x,y),"red"); //looks gross, may remove
+  // drawPoint(...scaleCoordToPixels(x,y),"red"); //looks gross, may remove
   return {
     x,
     y,
@@ -107,9 +103,10 @@ function gasPercentToCoordinate(percentAngleObject){
 
 }
 
+
+
 function calcCentroid(gasPercentArray) {
   
-  // calc surface area
   let coordObjList = Object.values(gasPercentArray).map((curr,idx)=>{
     return {
       r:curr.value,
@@ -117,33 +114,32 @@ function calcCentroid(gasPercentArray) {
       gas:curr.gas
     }
   }).map(curr => gasPercentToCoordinate(curr));
-  
-  //surface area broken because order wasn't preserved in map of coordinates
 
-  let surfaceArea = (1/2) * gasNames.reduce((acc,curr,idx,src)=>{
-    
+  const calcNextCoords = (curr,idx,src) => {
     let [x1,y1] = extractCoordinate(curr,coordObjList);
     let nextRef = idx === src.length-1 ? 0 : idx+1;
     let [x2,y2] = extractCoordinate(src[nextRef],coordObjList);
+
+    return {x1, y1, x2, y2}
+  }
+
+  let surfaceArea = (1/2) * gasNames.reduce((acc,curr,idx,src)=>{
+  
+    let {x1, y1, x2, y2} = calcNextCoords(curr,idx,src);
     
     return acc + parseFloat(x1*y2 - x2*y1)
 
   },0);
 
   const cx = (1/(6*surfaceArea)) * gasNames.reduce((acc,curr,idx,src)=>{
-    let [x1,y1] = extractCoordinate(curr,coordObjList);
-    let nextRef = idx === src.length-1 ? 0 : idx+1;
-    let [x2,y2] = extractCoordinate(src[nextRef],coordObjList);
+    let {x1, y1, x2, y2} = calcNextCoords(curr,idx,src);
 
     let summand = (x1+x2)*(x1*y2 - x2*y1);
     return acc + summand;
   },0)
 
   const cy = (1/(6*surfaceArea)) * gasNames.reduce((acc,curr,idx,src)=>{
-    let [x1,y1] = extractCoordinate(curr,coordObjList);
-    let nextRef = idx === src.length-1 ? 0 : idx+1;
-    let [x2,y2] = extractCoordinate(src[nextRef],coordObjList);
-
+    let {x1, y1, x2, y2} = calcNextCoords(curr,idx,src);
     let summand = (y1+y2)*(x1*y2 - x2*y1);
     
     return acc + summand;
